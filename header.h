@@ -23,7 +23,8 @@ typedef enum {
     IZMJENI,
     OTKAZI,
     SPREMI,
-    UCITAJ
+    UCITAJ,
+    PRETRAZI
 } Odabir;
 
 typedef struct {
@@ -53,5 +54,7 @@ void sortirajTermine();
 int usporediTermine(const void *a, const void *b);
 void siguranUnosStringa(char *buffer, int velicina);
 time_t obradiDatumVrijeme(const char *datum);
+int usporediImenaPacijenta(const void* a, const void* b);
+void pretraziPoImenu();
 
 #endif

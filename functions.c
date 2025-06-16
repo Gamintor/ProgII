@@ -28,6 +28,7 @@ void prikaziIzbornik() {
     printf("%d. Otkazi termin\n", OTKAZI);
     printf("%d. Spremi u datoteku\n", SPREMI);
     printf("%d. Ucitaj datoteku\n", UCITAJ);
+    printf("%d. Pretrazi po imenu i prezimenu pacijenta\n", PRETRAZI);
     printf("%d. Izlaz\n", IZLAZ);
 }
 
@@ -51,6 +52,9 @@ void rukovanjeIzbornikom(Odabir odabir) {
             break;
         case UCITAJ:
             ucitajIzDatoteke();
+            break;
+        case PRETRAZI:
+            pretraziPoImenu();
             break;
         case IZLAZ:
             printf("Izlaz iz sustava...\n");
@@ -313,4 +317,40 @@ time_t obradiDatumVrijeme(const char *datum) {
     }
     
     return rezultat;
+}
+
+int usporediImenaPacijenta(const void* a, const void* b) {
+    const Termin* terA = (const Termin*)a;
+    const Termin* terB = (const Termin*)b;
+    return strcmp(terA->pacijent, terB->pacijent);
+}
+
+void pretraziPoImenu() {
+    if (brojTermina == 0) {
+        printf("Nema termina za pretragu.\n");
+        return;
+    }
+    // Stvorimo kopiju termina za pretragu
+    Termin *kopijaTermini = malloc(sizeof(Termin) * brojTermina);
+    memcpy(kopijaTermini, termini, sizeof(Termin) * brojTermina);
+    // Sortiramo ga po imenima pacijenta
+    qsort(kopijaTermini, brojTermina, sizeof(Termin), usporediImenaPacijenta);
+
+    char trazenoIme[MAX_DUZINA];
+    printf("Unesi ime i prezime pacijenta za pretragu: ");
+    siguranUnosStringa(trazenoIme, MAX_DUZINA);
+
+    Termin *rezulatat = bsearch(trazenoIme, kopijaTermini, brojTermina, sizeof(Termin), usporediImenaPacijenta);
+
+    if(rezulatat) {
+        printf("\n===* Svi pronadeni termini za %s *===\n ", trazenoIme);
+        for(int i = 0; i < brojTermina; i++) {
+            if(strcmp(termini[i].pacijent, trazenoIme) == 0) {
+                ispisiTermin(&termini[i]);
+            }
+        }
+    } else {
+        printf("Nema termina za trazenog pacijenta!\n");
+    }
+    free(kopijaTermini);
 }
